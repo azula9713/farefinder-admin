@@ -18,4 +18,19 @@ const logoutUser = async () => {
   }
 };
 
-export { loginUser, logoutUser };
+const validateSession = async () => {
+  try {
+    const res = await Api.get("/auth/validate", {
+      headers: {
+        "x-refresh": localStorage.getItem("token"),
+        authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    });
+
+    return res.data;
+  } catch (err) {
+    return err.response.data;
+  }
+};
+
+export { loginUser, logoutUser, validateSession };

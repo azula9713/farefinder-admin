@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
@@ -20,7 +21,7 @@ import DashboardCard11 from "../partials/dashboard/DashboardCard11";
 import DashboardCard12 from "../partials/dashboard/DashboardCard12";
 import DashboardCard13 from "../partials/dashboard/DashboardCard13";
 
-function Dashboard() {
+const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -39,9 +40,9 @@ function Dashboard() {
             <WelcomeBanner />
 
             {/* Dashboard actions */}
-            <div className="sm:flex sm:justify-between sm:items-center mb-8">
+            <div className="sm:flex sm:justify-end sm:items-center mb-8">
               {/* Left: Avatars */}
-              <DashboardAvatars />
+              {/* <DashboardAvatars /> */}
 
               {/* Right: Actions */}
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
@@ -64,11 +65,11 @@ function Dashboard() {
 
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
-              {/* Line chart (Acme Plus) */}
+              {/* Line chart (Farefinder Plus) */}
               <DashboardCard01 />
-              {/* Line chart (Acme Advanced) */}
+              {/* Line chart (Farefinder Advanced) */}
               <DashboardCard02 />
-              {/* Line chart (Acme Professional) */}
+              {/* Line chart (Farefinder Professional) */}
               <DashboardCard03 />
               {/* Bar chart (Direct vs Indirect) */}
               <DashboardCard04 />
@@ -96,6 +97,6 @@ function Dashboard() {
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;

@@ -1,11 +1,20 @@
-import React, { useState } from "react";
-import SearchModal from "./header/SearchModal";
+import React, { useEffect } from "react";
+import { useRecoilValue } from "recoil";
+import { useNavigate } from "react-router-dom";
 import Notifications from "./header/Notifications";
-import Help from "./header/Help";
 import UserMenu from "./header/UserMenu";
+import { userAtom } from "../atoms/userAtom";
 
-function Header({ sidebarOpen, setSidebarOpen }) {
-  const [searchModalOpen, setSearchModalOpen] = useState(false);
+const Header = ({ sidebarOpen, setSidebarOpen }) => {
+  const navigate = useNavigate();
+
+  const user = useRecoilValue(userAtom);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user]);
 
   return (
     <header className="sticky top-0 bg-white border-b border-slate-200 z-30">
@@ -72,6 +81,6 @@ function Header({ sidebarOpen, setSidebarOpen }) {
       </div>
     </header>
   );
-}
+};
 
 export default Header;

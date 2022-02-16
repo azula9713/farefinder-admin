@@ -1,14 +1,24 @@
-import React, { useState } from "react";
-import { useMutation } from "react-query";
+import React, { useState, useEffect } from "react";
+import { useMutation, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import toast, { Toaster } from "react-hot-toast";
 import { LockClosedIcon } from "@heroicons/react/solid";
 
 import * as AuthAPI from "../api/AuthAPI";
+import { userAtom } from "../atoms/userAtom";
 
 const Login = () => {
   const navigate = useNavigate();
 
+  const toastOptions = {
+    style: {
+      background: "#04111d",
+      color: "#fff",
+    },
+  };
+
+  const [user, setUser] = useRecoilState(userAtom);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -16,25 +26,32 @@ const Login = () => {
     onSuccess: (data) => {
       console.log("data", data);
       if (data === "Invalid username or password") {
-        toast.error(data, {
-          style: {
-            background: "#04111d",
-            color: "#fff",
-          },
-        });
+        toast.error(data, toastOptions);
       }
       if (data.user) {
+        setUser(data.user);
         localStorage.setItem("token", data.refreshToken);
         sessionStorage.setItem("token", data.accessToken);
-        toast.success(`Welcome back ${data.user.firstName}`, {
-          style: {
-            background: "#04111d",
-            color: "#fff",
-          },
-        });
+        toast.success(`Welcome back ${data.user.firstName}`, toastOptions);
       }
     },
   });
+
+  const { data: userSession, isLoading: sessionLoading } = useQuery(
+    "validateSession",
+    () => AuthAPI.validateSession()
+  );
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (!user && token && userSession?._id) {
+      setUser(userSession);
+    }
+
+    if (user) {
+      navigate("/");
+    }
+  }, [user, userSession]);
 
   return (
     <>
