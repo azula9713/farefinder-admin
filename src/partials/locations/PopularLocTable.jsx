@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useRecoilState } from "recoil";
+import { PencilIcon } from "@heroicons/react/outline";
 import { popularLocationAtom } from "../../atoms/popularLocationAtom";
 import * as PopularLocationAPI from "../../api/PopularLocationsAPI";
 
@@ -34,7 +35,7 @@ const PopularLocTable = () => {
                   </tr>
                 </thead>
                 {isLoading ? (
-                  <div>Loading</div>
+                  <p>Loading</p>
                 ) : (
                   <tbody className="text-gray-600 text-sm font-light">
                     {popLocations.map((popLocation) => (
@@ -102,7 +103,8 @@ const PopularLocTable = () => {
                               </svg>
                             </div>
                             <div className="w-4 mr-2 transform hover:text-purple-500 hover:scale-110">
-                              <svg
+                              <PencilIcon />
+                              {/* <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -114,7 +116,7 @@ const PopularLocTable = () => {
                                   strokeWidth={2}
                                   d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                                 />
-                              </svg>
+                              </svg> */}
                             </div>
                             <div className="w-4 mr-2 transform hover:text-purple-500 hover:scale-110">
                               <svg

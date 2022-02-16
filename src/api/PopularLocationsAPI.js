@@ -9,4 +9,19 @@ const getAllPopularLocations = async () => {
   }
 };
 
-export { getAllPopularLocations };
+const createNewPopularLocation = async (data) => {
+  try {
+    const res = await Api.post("/popular-locations/create", data, {
+      headers: {
+        "x-refresh": localStorage.getItem("token"),
+        authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    });
+
+    return res.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export { getAllPopularLocations, createNewPopularLocation };
