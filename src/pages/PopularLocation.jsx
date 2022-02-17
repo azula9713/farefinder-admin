@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "react-query";
-import Header from "../partials/Header";
-import Sidebar from "../partials/Sidebar";
-import * as PopularLocationAPI from "../api/PopularLocationsAPI";
+import { useQuery, useMutation } from "react-query";
+import { useRecoilValue } from "recoil";
 import { useParams } from "react-router-dom";
 import {
   OfficeBuildingIcon,
@@ -11,10 +9,16 @@ import {
   TruckIcon,
 } from "@heroicons/react/solid";
 
+import Header from "../partials/Header";
+import Sidebar from "../partials/Sidebar";
+import * as PopularLocationAPI from "../api/PopularLocationsAPI";
+import { popularLocationAtom } from "../atoms/popularLocationAtom";
+
 const PopularLocation = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   //get locationId from url
   const { locationId } = useParams();
+  const popLocations = useRecoilValue(popularLocationAtom);
 
   const [isEdit, setIsEdit] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -27,6 +31,15 @@ const PopularLocation = () => {
 
   const { data, isLoading } = useQuery(["selectedLocation", locationId], () =>
     PopularLocationAPI.getSelectedPopularLocation(locationId)
+  );
+
+  const { mutate: edit, isLoading: updating } = useMutation(
+    PopularLocationAPI.updateSelectedPopularLocation,
+    {
+      onSuccess: (data) => {
+        setIsEdit(false);
+      },
+    }
   );
 
   useEffect(() => {
@@ -111,7 +124,7 @@ const PopularLocation = () => {
                                 disabled={!isEdit}
                                 type="checkbox"
                                 onChange={() => {
-                                  setIsActive(!isActive);
+                                  setIsActive(false);
                                 }}
                                 className="absolute opacity-0 w-0 h-0"
                               />
@@ -134,7 +147,9 @@ const PopularLocation = () => {
                                 id="isActive"
                                 type="checkbox"
                                 onChange={() => {
-                                  setIsActive(!isActive);
+                                  if (popLocations.length < 9) {
+                                    setIsActive(true);
+                                  }
                                 }}
                                 className="absolute opacity-0 w-0 h-0"
                               />
@@ -201,7 +216,7 @@ const PopularLocation = () => {
                       <div className="col-span-2 mb-4">
                         <textarea
                           type="text"
-                          disabled={!isEdit}
+                          disabled={!isEdit || updating}
                           rows="4"
                           value={newDescription}
                           onChange={(e) => setNewDescription(e.target.value)}
@@ -217,10 +232,26 @@ const PopularLocation = () => {
                         Delete Locaiton
                       </button>
                       <button
-                        disabled={!isEdit}
+                        disabled={!isEdit || updating}
+                        onClick={() => {
+                          const updatedData = {
+                            locationId: locationId,
+                            locationTitle: newTitle,
+                            locationImage: newImage,
+                            locationAirportCode: newAirportCode,
+                            locationHotelCode: newHotel,
+                            locationCarCode: newCar,
+                            locationDescription: newDescription,
+                            isActive,
+                          };
+
+                          edit({
+                            variables: { data: updatedData, id: locationId },
+                          });
+                        }}
                         className="disabled:bg-green-300 cursor-pointer px-4 py-2 rounded-md text-sm font-medium border-0 focus:outline-none focus:ring transition text-white bg-green-500 hover:bg-green-600 active:bg-green-700 focus:ring-green-300"
                       >
-                        Update Locaiton
+                        {updating ? "Updating" : "Update Location"}
                       </button>
                     </div>
                   </div>

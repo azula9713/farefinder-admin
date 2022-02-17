@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useMutation } from "react-query";
 import toast, { Toaster } from "react-hot-toast";
-import * as PopularLocationsAPI from "../../api/PopularLocationsAPI";
-import { useRecoilState } from "recoil";
+import * as PopularLocationAPI from "../../api/PopularLocationsAPI";
+import { useRecoilValue } from "recoil";
 import { popularLocationAtom } from "../../atoms/popularLocationAtom";
 
 const toastOptions = {
@@ -13,7 +13,7 @@ const toastOptions = {
 };
 
 const AddLocationModal = () => {
-  const [popLocations, setPopLocations] = useRecoilState(popularLocationAtom);
+  const popLocations = useRecoilValue(popularLocationAtom);
 
   const [locTitle, setLocTitle] = useState("");
   const [locDesc, setLocDesc] = useState("");
@@ -24,7 +24,7 @@ const AddLocationModal = () => {
   const [isLocActive, setIsLocActive] = useState(false);
 
   const { mutate, isLoading } = useMutation(
-    PopularLocationsAPI.createNewPopularLocation,
+    PopularLocationAPI.createNewPopularLocation,
     {
       onSuccess: (data) => {
         console.log("data", data);
