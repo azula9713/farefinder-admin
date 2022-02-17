@@ -47,7 +47,6 @@ const PopularLocation = () => {
     PopularLocationAPI.deleteSelectedPopularLocation,
     {
       onSuccess: (data) => {
-        console.log("deleted");
         navigate("/popular-locations");
         setIsEdit(false);
       },

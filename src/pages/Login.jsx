@@ -24,7 +24,6 @@ const Login = () => {
 
   const { mutate, isLoading } = useMutation(AuthAPI.loginUser, {
     onSuccess: (data) => {
-      console.log("data", data);
       if (data === "Invalid username or password") {
         toast.error(data, toastOptions);
       }

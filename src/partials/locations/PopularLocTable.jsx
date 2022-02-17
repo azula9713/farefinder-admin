@@ -16,13 +16,13 @@ const PopularLocTable = () => {
 
   useEffect(() => {
     if (data?.length > 0) {
-      console.log("data", data);
       setPopLocations(data);
     }
   }, [data]);
 
   return (
     <>
+      {/* [TODO]:Add Loader */}
       <div className="overflow-x-auto">
         <div className="min-w-screen bg-gray-100 flex items-center justify-center font-sans lg:overflow-hidden">
           <div className="w-full">

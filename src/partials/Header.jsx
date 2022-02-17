@@ -11,7 +11,10 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
   const user = useRecoilValue(userAtom);
 
   useEffect(() => {
-    if (!user) {
+    const token = sessionStorage.getItem("token");
+    //[TODO] validate token
+
+    if (!token) {
       navigate("/login");
     }
   }, [user]);
