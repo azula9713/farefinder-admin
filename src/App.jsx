@@ -9,6 +9,7 @@ import "./charts/ChartjsConfig";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import PopularLocations from "./pages/PopularLocations";
+import PopularLocation from "./pages/PopularLocation";
 
 function App() {
   const location = useLocation();
@@ -25,6 +26,10 @@ function App() {
         <Route exact path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route exact path="/popular-locations" element={<PopularLocations />} />
+        <Route
+          path="/popular-locations/:locationId"
+          element={<PopularLocation />}
+        />
         <Route path="*" element={<div>Not found</div>} />
       </Routes>
     </>

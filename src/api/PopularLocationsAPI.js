@@ -9,6 +9,20 @@ const getAllPopularLocations = async () => {
   }
 };
 
+const getSelectedPopularLocation = async (id) => {
+  try {
+    const res = await Api.get(`/popular-locations/${id}`, {
+      headers: {
+        "x-refresh": localStorage.getItem("token"),
+        authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    });
+    return res.data;
+  } catch (err) {
+    return err.response.data;
+  }
+};
+
 const createNewPopularLocation = async (data) => {
   try {
     const res = await Api.post("/popular-locations/create", data, {
@@ -24,4 +38,8 @@ const createNewPopularLocation = async (data) => {
   }
 };
 
-export { getAllPopularLocations, createNewPopularLocation };
+export {
+  getAllPopularLocations,
+  getSelectedPopularLocation,
+  createNewPopularLocation,
+};
