@@ -54,7 +54,6 @@ const deleteSelectedPopularLocation = async (id) => {
 };
 
 const updateSelectedPopularLocation = async (data) => {
-  console.log("data", data.variables.id);
   try {
     const res = await Api.put(
       `/popular-locations/update/${data.variables.id}`,

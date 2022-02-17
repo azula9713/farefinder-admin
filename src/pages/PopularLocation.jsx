@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "react-query";
 import { useRecoilValue } from "recoil";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   OfficeBuildingIcon,
   PaperAirplaneIcon,
@@ -18,6 +18,7 @@ const PopularLocation = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   //get locationId from url
   const { locationId } = useParams();
+  const navigate = useNavigate();
   const popLocations = useRecoilValue(popularLocationAtom);
 
   const [isEdit, setIsEdit] = useState(false);
@@ -37,6 +38,17 @@ const PopularLocation = () => {
     PopularLocationAPI.updateSelectedPopularLocation,
     {
       onSuccess: (data) => {
+        setIsEdit(false);
+      },
+    }
+  );
+
+  const { mutate: deleteLoc, isLoading: deleting } = useMutation(
+    PopularLocationAPI.deleteSelectedPopularLocation,
+    {
+      onSuccess: (data) => {
+        console.log("deleted");
+        navigate("/popular-locations");
         setIsEdit(false);
       },
     }
@@ -227,9 +239,12 @@ const PopularLocation = () => {
                     <div className="m-4 flex items-center justify-end space-x-5">
                       <button
                         disabled={!isEdit}
+                        onClick={() => {
+                          deleteLoc(locationId);
+                        }}
                         className="disabled:bg-red-300 cursor-pointer px-4 py-2 rounded-md text-sm font-medium border-0 focus:outline-none focus:ring transition text-white bg-red-500 hover:bg-red-600 active:bg-red-700 focus:ring-red-300"
                       >
-                        Delete Locaiton
+                        {deleting ? "Deleting..." : "Delete"}
                       </button>
                       <button
                         disabled={!isEdit || updating}
