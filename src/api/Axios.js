@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const Api = axios.create({
-  baseURL: "http://localhost:1337/api/v1",
+  baseURL: "https://farefinderapi.devserver.click/api/v1",
 });
 
 export default Api;
