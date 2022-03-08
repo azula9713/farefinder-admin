@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import PopularLocations from "./pages/PopularLocations";
 import PopularLocation from "./pages/PopularLocation";
+import HotelScripts from "./pages/HotelScripts";
 
 function App() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function App() {
           path="/popular-locations/:locationId"
           element={<PopularLocation />}
         />
+        <Route exact path="/hotelscripts" element={<HotelScripts />} />
         <Route path="*" element={<div>Not found</div>} />
       </Routes>
     </>

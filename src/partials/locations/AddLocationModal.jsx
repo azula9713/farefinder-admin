@@ -249,10 +249,6 @@ const AddLocationModal = () => {
                     >
                       Make Active Location
                     </label>
-                    {/* <p className="text-gray-500">
-                  Get notified when someones posts a comment on a
-                  posting.
-                </p> */}
                   </div>
                 </div>
               </div>
