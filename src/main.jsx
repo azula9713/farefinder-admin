@@ -5,7 +5,13 @@ import { RecoilRoot } from "recoil";
 import { HashRouter as Router } from "react-router-dom";
 import App from "./App";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>

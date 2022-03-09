@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import { useMutation } from "react-query";
-import toast, { Toaster } from "react-hot-toast";
+import { useMutation, useQueryClient } from "react-query";
 import * as HotelScriptsAPI from "../../api/HotelScriptsAPI";
 import { useRecoilValue } from "recoil";
 import { hotelScriptsAtom } from "../../atoms/hotelScriptsAtom";
 
-const toastOptions = {
-  style: {
-    background: "#04111d",
-    color: "#fff",
-  },
-};
-
-const AddHotelScriptModal = () => {
+const AddHotelScriptModal = ({ close, maximumErrorToast, successToast }) => {
+  const client = useQueryClient();
   const hotelScripts = useRecoilValue(hotelScriptsAtom);
 
   const [hotelName, setHotelName] = useState("");
@@ -23,6 +16,10 @@ const AddHotelScriptModal = () => {
     HotelScriptsAPI.createNewHotelScript,
     {
       onSuccess: (data) => {
+        //invalidate cache
+        successToast();
+        client.invalidateQueries("hotelscripts");
+        close();
         // [TODO]:Add the toast
       },
     }
@@ -30,18 +27,17 @@ const AddHotelScriptModal = () => {
 
   return (
     <div>
-      <Toaster position="top-center" reverseOrder={false} />
       <h2 className="text-center font-bold text-black">Add New Hotel Script</h2>
       <div>
-        <div className="md:grid md:grid-cols-6 md:gap-6">
-          <div className="mt-5 md:mt-0 md:col-span-6">
+        <div className="w-full">
+          <div className="mt-5 md:mt-0 w-full">
             <div className="sm:rounded-md sm:overflow-hidden">
               <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="col-span-6 sm:col-span-3">
+                <div className="w-full">
+                  <div className="flex justify-center items-center space-x-4">
                     <label
                       htmlFor="location-name"
-                      className="block text-sm font-medium text-gray-700"
+                      className="block text-sm font-medium text-gray-700 whitespace-nowrap"
                     >
                       Hotel Title
                     </label>
@@ -54,12 +50,12 @@ const AddHotelScriptModal = () => {
                       name="location-name"
                       id="location-name"
                       autoComplete="location-name"
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-56"
                     />
                   </div>
                 </div>
 
-                <div>
+                <div className="flex justify-center items-center space-x-4">
                   <label
                     htmlFor="about"
                     className="block text-sm font-medium text-gray-700"
@@ -74,8 +70,8 @@ const AddHotelScriptModal = () => {
                         setScript(e.target.value);
                       }}
                       name="description"
-                      rows={3}
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
+                      rows={9}
+                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm border-gray-300 rounded-md w-56"
                       placeholder="Paste the src of the script here"
                     />
                   </div>
@@ -92,11 +88,8 @@ const AddHotelScriptModal = () => {
                           setActiveDefault(true);
                         } else if (activeDefault) {
                           setActiveDefault(false);
-                        } else {
-                          toast.error(
-                            "Cannot set more than 3 active hotels at once",
-                            toastOptions
-                          );
+                        } else if (!activeDefault && hotelScripts.length >= 3) {
+                          maximumErrorToast();
                         }
                       }}
                       type="checkbox"
@@ -130,7 +123,7 @@ const AddHotelScriptModal = () => {
           }}
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
         >
-          {isLoading ? "Creating Location..." : "Create Location"}
+          {isLoading ? "Saving Script..." : "Save Script"}
         </button>
       </div>
     </div>
