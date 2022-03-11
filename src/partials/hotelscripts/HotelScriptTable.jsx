@@ -1,18 +1,117 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "react-query";
+import React, { useEffect, useState } from "react";
+import Modal from "react-modal";
+import toast, { Toaster } from "react-hot-toast";
+import { useQuery, useQueryClient, useMutation } from "react-query";
+import { XIcon } from "@heroicons/react/solid";
 import { useRecoilState } from "recoil";
-import { EyeIcon, PencilIcon } from "@heroicons/react/outline";
+import { PencilIcon } from "@heroicons/react/outline";
 import { hotelScriptsAtom } from "../../atoms/hotelScriptsAtom";
 import * as HotelScriptAPI from "../../api/HotelScriptsAPI";
+import DeleteModal from "../DeleteModal";
+import EditScriptModal from "./EditScriptModal";
+
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
+const deleteModalStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    background: "none",
+    border: "none",
+  },
+};
+
+const toastOptions = {
+  style: {
+    background: "#04111d",
+    color: "#fff",
+  },
+};
 
 const HotelScriptTable = () => {
-  const navigate = useNavigate();
+  const client = useQueryClient();
   const [hotelScripts, setHotelScripts] = useRecoilState(hotelScriptsAtom);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState("");
+  const [selectedHotelScript, setSelectedHotelScript] = useState(null);
 
-  const { data, isLoading } = useQuery("hotelscripts", () =>
+  const deleteSuccess = () => {
+    toast.success("Hotel script deleted successfully!", toastOptions);
+  };
+
+  const editSuccess = () => {
+    toast.success("Hotel script updated successfully!", toastOptions);
+  };
+
+  const errorUpdate = () => {
+    toast.error("Error updating hotel script!", toastOptions);
+  };
+
+  const errorDelete = () => {
+    toast.error("Unable to delete hotel script", toastOptions);
+  };
+
+  const maximumValidErrorToast = () => {
+    toast.error("Cannot set more than 3 active hotels at once", toastOptions);
+  };
+
+  const { data } = useQuery("hotelscripts", () =>
     HotelScriptAPI.getAllHotelScripts()
   );
+
+  const { mutate: edit, isLoading: updating } = useMutation(
+    HotelScriptAPI.updateSelectedHotelScript,
+    {
+      onSuccess: () => {
+        handleEditModal();
+        client.invalidateQueries("hotelscripts");
+        editSuccess();
+      },
+      onError: () => {
+        handleEditModal();
+        errorUpdate();
+      },
+    }
+  );
+
+  const { mutate: deleteScript, isLoading: deleting } = useMutation(
+    HotelScriptAPI.deleteSelectedHotelScript,
+    {
+      onSuccess: () => {
+        client.invalidateQueries("hotelscripts");
+        deleteSuccess();
+        handleDeleteModal();
+      },
+      onError: () => {
+        handleDeleteModal();
+        errorDelete();
+      },
+    }
+  );
+
+  Modal.setAppElement("#root");
+
+  function handleEditModal() {
+    setEditModalOpen(!editModalOpen);
+  }
+
+  function handleDeleteModal() {
+    setDeleteModalOpen(!deleteModalOpen);
+  }
 
   useEffect(() => {
     if (data?.length > 0) {
@@ -22,7 +121,38 @@ const HotelScriptTable = () => {
 
   return (
     <>
-      {/* [TODO]:Add Loader */}
+      <Toaster position="bottom-center" reverseOrder={false} />
+      <Modal
+        isOpen={deleteModalOpen}
+        onRequestClose={handleDeleteModal}
+        style={deleteModalStyles}
+        contentLabel="Delete Hotel Script"
+      >
+        <DeleteModal
+          close={handleDeleteModal}
+          id={selectedId}
+          action={deleteScript}
+          state={deleting}
+        />
+      </Modal>
+      <Modal
+        isOpen={editModalOpen}
+        onRequestClose={handleEditModal}
+        style={customStyles}
+        contentLabel="Delete Hotel Script"
+      >
+        <div className="flex items-center justify-end">
+          <button onClick={handleEditModal}>
+            <XIcon className="w-5 h-5" />
+          </button>
+        </div>
+        <EditScriptModal
+          edit={edit}
+          loading={updating}
+          maximumErrorToast={maximumValidErrorToast}
+          hotelScript={selectedHotelScript}
+        />
+      </Modal>
       <div className="overflow-x-auto">
         <div className="min-w-screen bg-gray-100 flex items-center justify-center font-sans lg:overflow-hidden">
           <div className="w-full">
@@ -76,18 +206,20 @@ const HotelScriptTable = () => {
                       <td className="py-3 px-6 text-center">
                         <div className="flex item-center justify-center">
                           <div className="w-4 mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer">
-                            <EyeIcon
+                            <PencilIcon
                               onClick={() => {
-                                navigate(
-                                  `/hotelscripts/${script.hotelScriptId}`
-                                );
+                                setSelectedHotelScript(script);
+                                handleEditModal();
                               }}
                             />
                           </div>
-                          <div className="w-4 mr-2 transform hover:text-purple-500 hover:scale-110 cursor-pointer">
-                            <PencilIcon />
-                          </div>
-                          <div className="w-4 mr-2 transform hover:text-purple-500 hover:scale-110">
+                          <div
+                            className="w-4 mr-2 transform hover:text-purple-500 hover:scale-110"
+                            onClick={() => {
+                              setSelectedId(script.hotelScriptId);
+                              handleDeleteModal();
+                            }}
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"

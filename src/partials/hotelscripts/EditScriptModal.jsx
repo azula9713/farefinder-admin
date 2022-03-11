@@ -1,32 +1,24 @@
-import React, { useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
-import * as HotelScriptsAPI from "../../api/HotelScriptsAPI";
-import { useRecoilValue } from "recoil";
-import { hotelScriptsAtom } from "../../atoms/hotelScriptsAtom";
+import { useState, useEffect } from "react";
 
-const AddHotelScriptModal = ({ close, maximumErrorToast, successToast }) => {
-  const client = useQueryClient();
-  const hotelScripts = useRecoilValue(hotelScriptsAtom);
-
+const EditScriptModal = ({ hotelScript, maximumErrorToast, loading, edit }) => {
   const [hotelName, setHotelName] = useState("");
   const [script, setScript] = useState("");
   const [activeDefault, setActiveDefault] = useState(false);
 
-  const { mutate, isLoading } = useMutation(
-    HotelScriptsAPI.createNewHotelScript,
-    {
-      onSuccess: () => {
-        //invalidate cache
-        successToast();
-        client.invalidateQueries("hotelscripts");
-        close();
-      },
+  useEffect(() => {
+    if (hotelScript) {
+      console.log("hotelScript", hotelScript);
+      setHotelName(hotelScript.hotelName);
+      setScript(hotelScript.scriptSource);
+      setActiveDefault(hotelScript.isActive);
     }
-  );
+  }, [hotelScript]);
 
   return (
     <div>
-      <h2 className="text-center font-bold text-black">Add New Hotel Script</h2>
+      <h2 className="text-center font-bold text-black">
+        Edit New Hotel Script
+      </h2>
       <div>
         <div className="w-full">
           <div className="mt-5 md:mt-0 w-full">
@@ -113,20 +105,23 @@ const AddHotelScriptModal = ({ close, maximumErrorToast, successToast }) => {
       <div className="flex items-center justify-end space-x-8 mt-8">
         <button
           onClick={() => {
-            const data = {
+            const updatedData = {
               hotelName,
               scriptSource: script,
               isActive: activeDefault,
             };
-            mutate(data);
+
+            edit({
+              variables: { data: updatedData, id: hotelScript.hotelScriptId },
+            });
           }}
           className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
         >
-          {isLoading ? "Saving Script..." : "Save Script"}
+          {loading ? "Updating Script..." : "Update Script"}
         </button>
       </div>
     </div>
   );
 };
 
-export default AddHotelScriptModal;
+export default EditScriptModal;

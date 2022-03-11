@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
+import toast, { Toaster } from "react-hot-toast";
 import Header from "../partials/Header";
 import AddLocationModal from "../partials/locations/AddLocationModal";
 import PopularLocTable from "../partials/locations/PopularLocTable";
@@ -17,9 +18,24 @@ const customStyles = {
   },
 };
 
+const toastOptions = {
+  style: {
+    background: "#04111d",
+    color: "#fff",
+  },
+};
+
 const PopularLocations = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
+
+  const maximumValidErrorToast = () => {
+    toast.error("Cannot set more than 9 locations at once", toastOptions);
+  };
+
+  const successSaveToast = () => {
+    toast.success("Location saved successfully", toastOptions);
+  };
 
   function handleModal() {
     setIsOpen(!modalIsOpen);
@@ -29,6 +45,7 @@ const PopularLocations = () => {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <Toaster position="bottom-center" reverseOrder={false} />
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       {/* Content area */}
@@ -46,7 +63,11 @@ const PopularLocations = () => {
               <XIcon className="w-5 h-5" />
             </button>
           </div>
-          <AddLocationModal />
+          <AddLocationModal
+            close={handleModal}
+            maximumErrorToast={maximumValidErrorToast}
+            successToast={successSaveToast}
+          />
         </Modal>
         <main>
           <div className="mt-3 mx-3 2xl:mx-16 px-8 pt-3 flex items-center justify-end">

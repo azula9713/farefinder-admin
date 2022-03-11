@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import { useMutation } from "react-query";
-import toast, { Toaster } from "react-hot-toast";
+import { useMutation, useQueryClient } from "react-query";
 import * as PopularLocationAPI from "../../api/PopularLocationsAPI";
 import { useRecoilValue } from "recoil";
 import { popularLocationAtom } from "../../atoms/popularLocationAtom";
 
-const toastOptions = {
-  style: {
-    background: "#04111d",
-    color: "#fff",
-  },
-};
-
-const AddLocationModal = () => {
+const AddLocationModal = ({ close, maximumErrorToast, successToast }) => {
+  const client = useQueryClient();
   const popLocations = useRecoilValue(popularLocationAtom);
 
   const [locTitle, setLocTitle] = useState("");
@@ -27,14 +20,15 @@ const AddLocationModal = () => {
     PopularLocationAPI.createNewPopularLocation,
     {
       onSuccess: (data) => {
-        // [TODO]:Add the toast
+        successToast();
+        client.invalidateQueries("popularLocations");
+        close();
       },
     }
   );
 
   return (
     <div>
-      <Toaster position="top-center" reverseOrder={false} />
       <h2 className="text-center font-bold text-black">Add New Location</h2>
       <div>
         <div className="md:grid md:grid-cols-6 md:gap-6">
@@ -232,10 +226,7 @@ const AddLocationModal = () => {
                         } else if (isLocActive) {
                           setIsLocActive(false);
                         } else {
-                          toast.error(
-                            "Cannot set more than 9 active locations at once",
-                            toastOptions
-                          );
+                          maximumErrorToast();
                         }
                       }}
                       type="checkbox"

@@ -37,7 +37,7 @@ const PopularLocation = () => {
   const { mutate: edit, isLoading: updating } = useMutation(
     PopularLocationAPI.updateSelectedPopularLocation,
     {
-      onSuccess: (data) => {
+      onSuccess: () => {
         setIsEdit(false);
       },
     }
@@ -46,7 +46,7 @@ const PopularLocation = () => {
   const { mutate: deleteLoc, isLoading: deleting } = useMutation(
     PopularLocationAPI.deleteSelectedPopularLocation,
     {
-      onSuccess: (data) => {
+      onSuccess: () => {
         navigate("/popular-locations");
         setIsEdit(false);
       },
