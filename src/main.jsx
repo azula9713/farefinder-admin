@@ -1,11 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { RecoilRoot } from "recoil";
-import { BrowserRouter as Router } from "react-router-dom";
+import { HashRouter as Router } from "react-router-dom";
 import App from "./App";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>
@@ -14,6 +20,7 @@ ReactDOM.render(
         <Router>
           <App />
         </Router>
+        {/* <ReactQueryDevtools /> */}
       </QueryClientProvider>
     </RecoilRoot>
   </React.StrictMode>,
