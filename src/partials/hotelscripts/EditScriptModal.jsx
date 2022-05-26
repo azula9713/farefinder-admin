@@ -1,18 +1,29 @@
 import { useState, useEffect } from "react";
+import { useRecoilValue } from "recoil";
+import { hotelScriptsAtom } from "../../atoms/hotelScriptsAtom";
 
 const EditScriptModal = ({ hotelScript, maximumErrorToast, loading, edit }) => {
   const [hotelName, setHotelName] = useState("");
   const [script, setScript] = useState("");
   const [activeDefault, setActiveDefault] = useState(false);
+  const hotelScripts = useRecoilValue(hotelScriptsAtom);
+  const [activeScripts, setActiveScripts] = useState([]);
 
   useEffect(() => {
     if (hotelScript) {
-      console.log("hotelScript", hotelScript);
       setHotelName(hotelScript.hotelName);
       setScript(hotelScript.scriptSource);
       setActiveDefault(hotelScript.isActive);
     }
   }, [hotelScript]);
+
+  useEffect(() => {
+    if (hotelScripts.length > 0) {
+      const active = hotelScripts.filter((scr) => scr.isActive);
+
+      setActiveScripts(active);
+    }
+  }, [hotelScripts]);
 
   return (
     <div>
@@ -75,11 +86,14 @@ const EditScriptModal = ({ hotelScript, maximumErrorToast, loading, edit }) => {
                       value={activeDefault}
                       checked={activeDefault}
                       onChange={() => {
-                        if (!activeDefault && hotelScripts.length < 3) {
+                        if (!activeDefault && activeScripts.length < 3) {
                           setActiveDefault(true);
                         } else if (activeDefault) {
                           setActiveDefault(false);
-                        } else if (!activeDefault && hotelScripts.length >= 3) {
+                        } else if (
+                          !activeDefault &&
+                          activeScripts.length >= 3
+                        ) {
                           maximumErrorToast();
                         }
                       }}
