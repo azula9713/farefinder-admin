@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -48,7 +48,7 @@ const Dashboard = () => {
     }
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (data) {
       setHomeLocation(data[0].locationName);
     }
