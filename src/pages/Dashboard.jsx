@@ -1,29 +1,66 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
+import { useQuery, useQueryClient, useMutation } from "react-query";
+import toast, { Toaster } from "react-hot-toast";
 
 import Sidebar from "../partials/Sidebar";
 import Header from "../partials/Header";
+import * as HomepageLocationAPI from "../api/HomepageLocation";
 import WelcomeBanner from "../partials/dashboard/WelcomeBanner";
-import FilterButton from "../partials/actions/FilterButton";
-import Datepicker from "../partials/actions/Datepicker";
 import DashboardCard01 from "../partials/dashboard/DashboardCard01";
 import DashboardCard02 from "../partials/dashboard/DashboardCard02";
 import DashboardCard03 from "../partials/dashboard/DashboardCard03";
-import DashboardCard04 from "../partials/dashboard/DashboardCard04";
-import DashboardCard05 from "../partials/dashboard/DashboardCard05";
-import DashboardCard06 from "../partials/dashboard/DashboardCard06";
-import DashboardCard07 from "../partials/dashboard/DashboardCard07";
-import DashboardCard08 from "../partials/dashboard/DashboardCard08";
-import DashboardCard09 from "../partials/dashboard/DashboardCard09";
-import DashboardCard10 from "../partials/dashboard/DashboardCard10";
-import DashboardCard11 from "../partials/dashboard/DashboardCard11";
-import DashboardCard12 from "../partials/dashboard/DashboardCard12";
-import DashboardCard13 from "../partials/dashboard/DashboardCard13";
 
 const Dashboard = () => {
+  const toastOptions = {
+    style: {
+      background: "#04111d",
+      color: "#fff",
+    },
+  };
+
+  const client = useQueryClient();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [homeLocation, setHomeLocation] = useState("");
+
+  const editSuccess = () => {
+    toast.success("Hotel script updated successfully!", toastOptions);
+  };
+
+  const errorUpdate = () => {
+    toast.error("Error updating hotel script!", toastOptions);
+  };
+
+  const { data } = useQuery("homeLocations", () =>
+    HomepageLocationAPI.getAllLocationsForHomepage()
+  );
+
+  const { mutate: edit, isLoading: updating } = useMutation(
+    HomepageLocationAPI.updateHomepageLocation,
+    {
+      onSuccess: () => {
+        client.invalidateQueries("homeLocations");
+        editSuccess();
+      },
+      onError: () => {
+        errorUpdate();
+      },
+    }
+  );
+
+  useLayoutEffect(() => {
+    if (data) {
+      setHomeLocation(data[0].locationName);
+    }
+
+    return () => {
+      setHomeLocation("");
+    };
+  }, [data]);
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <Toaster position="bottom-center" reverseOrder={false} />
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -38,17 +75,12 @@ const Dashboard = () => {
             <WelcomeBanner />
 
             {/* Dashboard actions */}
-            <div className="sm:flex sm:justify-end sm:items-center mb-8">
-              {/* Left: Avatars */}
-              {/* <DashboardAvatars /> */}
-
-              {/* Right: Actions */}
+            {/* <div className="sm:flex sm:justify-end sm:items-center mb-8">
               <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
-                {/* Filter button */}
                 <FilterButton />
-                {/* Datepicker built with flatpickr */}
+
                 <Datepicker />
-                {/* Add view button */}
+
                 <button className="btn bg-indigo-500 hover:bg-indigo-600 text-white">
                   <svg
                     className="w-4 h-4 fill-current opacity-50 shrink-0"
@@ -59,36 +91,42 @@ const Dashboard = () => {
                   <span className="hidden xs:block ml-2">Add view</span>
                 </button>
               </div>
+            </div> */}
+            <div className="sm:flex sm:justify-end sm:items-center mb-8">
+              <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+                <input
+                  type="text"
+                  value={homeLocation}
+                  onChange={(e) => setHomeLocation(e.target.value)}
+                  className="form-input  text-slate-500 hover:text-slate-600 font-semibold text-xl focus:border-slate-300 w-60"
+                />
+
+                <button
+                  className="btn bg-indigo-500 hover:bg-indigo-600 text-white"
+                  onClick={() => {
+                    edit({
+                      variables: {
+                        data: {
+                          ...data[0],
+                          locationName: homeLocation,
+                        },
+                        id: data[0].locationNameId,
+                      },
+                    });
+                  }}
+                >
+                  {updating ? "Updating..." : "Update"}
+                </button>
+              </div>
             </div>
 
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
-              {/* Line chart (Farefinder Plus) */}
               <DashboardCard01 />
-              {/* Line chart (Farefinder Advanced) */}
+
               <DashboardCard02 />
-              {/* Line chart (Farefinder Professional) */}
+
               <DashboardCard03 />
-              {/* Bar chart (Direct vs Indirect) */}
-              <DashboardCard04 />
-              {/* Line chart (Real Time Value) */}
-              <DashboardCard05 />
-              {/* Doughnut chart (Top Countries) */}
-              <DashboardCard06 />
-              {/* Table (Top Channels) */}
-              <DashboardCard07 />
-              {/* Line chart (Sales Over Time) */}
-              <DashboardCard08 />
-              {/* Stacked bar chart (Sales VS Refunds) */}
-              <DashboardCard09 />
-              {/* Card (Customers) */}
-              <DashboardCard10 />
-              {/* Card (Reasons for Refunds) */}
-              <DashboardCard11 />
-              {/* Card (Recent Activity) */}
-              <DashboardCard12 />
-              {/* Card (Income/Expenses) */}
-              <DashboardCard13 />
             </div>
           </div>
         </main>
