@@ -98,7 +98,7 @@ const Dashboard = () => {
                   type="text"
                   value={homeLocation}
                   onChange={(e) => setHomeLocation(e.target.value)}
-                  className="form-input  text-slate-500 hover:text-slate-600 font-semibold text-xl focus:border-slate-300 w-60"
+                  className="form-input  text-slate-500 hover:text-slate-600 font-semibold text-xl focus:border-slate-300 lg:w-[600px] w-60"
                 />
 
                 <button
