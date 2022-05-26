@@ -28,6 +28,4 @@ const updateHomepageLocation = async (data) => {
   }
 };
 
-// const createNewHomepageLocation = async (data) => {};
-
 export { getAllLocationsForHomepage, updateHomepageLocation };
